@@ -1,0 +1,2 @@
+-- V1__init.sql
+-- Baseline schema definition for fintech-ledger-api
