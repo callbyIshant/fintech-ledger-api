@@ -13,14 +13,16 @@ public class Account {
     private Money balance;
     private final Instant createdAt;
     private Instant updatedAt;
+    private final Long version;
 
-    public Account(AccountId id, TenantId tenantId, Currency currency, Money initialBalance, AccountStatus status, Instant createdAt, Instant updatedAt) {
+    public Account(AccountId id, TenantId tenantId, Currency currency, Money initialBalance, AccountStatus status, Instant createdAt, Instant updatedAt, Long version) {
         this.id = Objects.requireNonNull(id, "AccountId cannot be null");
         this.tenantId = Objects.requireNonNull(tenantId, "TenantId cannot be null");
         this.currency = Objects.requireNonNull(currency, "Currency cannot be null");
         this.status = Objects.requireNonNull(status, "AccountStatus cannot be null");
         this.createdAt = Objects.requireNonNull(createdAt, "CreatedAt cannot be null");
         this.updatedAt = Objects.requireNonNull(updatedAt, "UpdatedAt cannot be null");
+        this.version = version != null ? version : 0L;
 
         Money initial = initialBalance != null ? initialBalance : Money.zero(currency);
         if (!initial.currency().equals(currency)) {
@@ -30,6 +32,10 @@ public class Account {
             throw new IllegalArgumentException("Initial account balance cannot be negative: " + initial);
         }
         this.balance = initial;
+    }
+
+    public Account(AccountId id, TenantId tenantId, Currency currency, Money initialBalance, AccountStatus status, Instant createdAt, Instant updatedAt) {
+        this(id, tenantId, currency, initialBalance, status, createdAt, updatedAt, 0L);
     }
 
     public static Account create(AccountId id, TenantId tenantId, Currency currency) {
@@ -124,6 +130,10 @@ public class Account {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public Long getVersion() {
+        return version;
     }
 
     private void ensureActive() {

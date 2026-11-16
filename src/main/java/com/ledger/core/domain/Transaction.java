@@ -16,12 +16,17 @@ public class Transaction {
     private final Instant createdAt;
     private Instant finalizedAt;
     private final String description;
+    private final Long version;
 
     public Transaction(TransactionId id, TenantId tenantId, String description) {
-        this(id, tenantId, new ArrayList<>(), TransactionStatus.DRAFT, Instant.now(), null, description);
+        this(id, tenantId, new ArrayList<>(), TransactionStatus.DRAFT, Instant.now(), null, description, 0L);
     }
 
     public Transaction(TransactionId id, TenantId tenantId, List<LedgerEntry> entries, TransactionStatus status, Instant createdAt, Instant finalizedAt, String description) {
+        this(id, tenantId, entries, status, createdAt, finalizedAt, description, 0L);
+    }
+
+    public Transaction(TransactionId id, TenantId tenantId, List<LedgerEntry> entries, TransactionStatus status, Instant createdAt, Instant finalizedAt, String description, Long version) {
         this.id = Objects.requireNonNull(id, "TransactionId cannot be null");
         this.tenantId = Objects.requireNonNull(tenantId, "TenantId cannot be null");
         this.entries = new ArrayList<>(Objects.requireNonNull(entries, "Entries cannot be null"));
@@ -29,6 +34,7 @@ public class Transaction {
         this.createdAt = Objects.requireNonNull(createdAt, "CreatedAt cannot be null");
         this.finalizedAt = finalizedAt;
         this.description = description;
+        this.version = version != null ? version : 0L;
 
         validateEntriesCurrency();
     }
@@ -154,6 +160,10 @@ public class Transaction {
 
     public String getDescription() {
         return description;
+    }
+
+    public Long getVersion() {
+        return version;
     }
 
     private void validateEntriesCurrency() {
