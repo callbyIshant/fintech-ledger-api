@@ -7,8 +7,10 @@ import com.ledger.core.domain.TenantId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Component
 public class LedgerEntryPersistenceAdapter implements LedgerEntryRepositoryPort {
@@ -30,6 +32,31 @@ public class LedgerEntryPersistenceAdapter implements LedgerEntryRepositoryPort 
         PageRequest pageRequest = PageRequest.of(page, size);
         List<LedgerEntryJpaEntity> entities = repository
                 .findByTenantIdAndAccountIdOrderByCreatedAtDesc(tenantId.value(), accountId.value(), pageRequest);
+
+        return entities.stream()
+                .map(mapper::toDomainEntry)
+                .toList();
+    }
+
+    @Override
+    public List<LedgerEntry> findByTenantIdAndAccountIdWithCursor(
+            TenantId tenantId,
+            AccountId accountId,
+            Instant cursorCreatedAt,
+            UUID cursorId,
+            int limit
+    ) {
+        Objects.requireNonNull(tenantId, "TenantId cannot be null");
+        Objects.requireNonNull(accountId, "AccountId cannot be null");
+
+        PageRequest pageRequest = PageRequest.of(0, limit);
+        List<LedgerEntryJpaEntity> entities = repository.findByTenantIdAndAccountIdWithCursor(
+                tenantId.value(),
+                accountId.value(),
+                cursorCreatedAt,
+                cursorId,
+                pageRequest
+        );
 
         return entities.stream()
                 .map(mapper::toDomainEntry)

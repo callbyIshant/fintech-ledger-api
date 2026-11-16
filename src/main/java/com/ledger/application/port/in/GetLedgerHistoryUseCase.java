@@ -26,6 +26,19 @@ public interface GetLedgerHistoryUseCase {
         }
     }
 
+    record GetLedgerHistoryCursorQuery(
+            TenantId tenantId,
+            AccountId accountId,
+            String cursor,
+            int limit
+    ) {
+        public GetLedgerHistoryCursorQuery {
+            Objects.requireNonNull(tenantId, "tenantId cannot be null");
+            Objects.requireNonNull(accountId, "accountId cannot be null");
+            if (limit <= 0) throw new IllegalArgumentException("limit must be positive");
+        }
+    }
+
     record LedgerEntryResult(
             UUID id,
             AccountId accountId,
@@ -35,5 +48,13 @@ public interface GetLedgerHistoryUseCase {
             String description
     ) {}
 
+    record CursorPageResult<T>(
+            List<T> items,
+            String nextCursor,
+            boolean hasMore
+    ) {}
+
     List<LedgerEntryResult> getLedgerHistory(GetLedgerHistoryQuery query);
+
+    CursorPageResult<LedgerEntryResult> getLedgerHistoryWithCursor(GetLedgerHistoryCursorQuery query);
 }
