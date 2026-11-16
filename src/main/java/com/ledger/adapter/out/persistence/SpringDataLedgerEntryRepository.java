@@ -20,7 +20,7 @@ public interface SpringDataLedgerEntryRepository extends JpaRepository<LedgerEnt
     );
 
     @Query("SELECT e FROM LedgerEntryJpaEntity e WHERE e.tenantId = :tenantId AND e.accountId = :accountId " +
-           "AND (:cursorCreatedAt IS NULL OR e.createdAt < :cursorCreatedAt OR (e.createdAt = :cursorCreatedAt AND e.id < :cursorId)) " +
+           "AND (e.createdAt < :cursorCreatedAt OR (e.createdAt = :cursorCreatedAt AND e.id < :cursorId)) " +
            "ORDER BY e.createdAt DESC, e.id DESC")
     List<LedgerEntryJpaEntity> findByTenantIdAndAccountIdWithCursor(
             @Param("tenantId") String tenantId,

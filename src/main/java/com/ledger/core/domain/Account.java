@@ -22,7 +22,7 @@ public class Account {
         this.status = Objects.requireNonNull(status, "AccountStatus cannot be null");
         this.createdAt = Objects.requireNonNull(createdAt, "CreatedAt cannot be null");
         this.updatedAt = Objects.requireNonNull(updatedAt, "UpdatedAt cannot be null");
-        this.version = version != null ? version : 0L;
+        this.version = version;
 
         Money initial = initialBalance != null ? initialBalance : Money.zero(currency);
         if (!initial.currency().equals(currency)) {
@@ -35,7 +35,7 @@ public class Account {
     }
 
     public Account(AccountId id, TenantId tenantId, Currency currency, Money initialBalance, AccountStatus status, Instant createdAt, Instant updatedAt) {
-        this(id, tenantId, currency, initialBalance, status, createdAt, updatedAt, 0L);
+        this(id, tenantId, currency, initialBalance, status, createdAt, updatedAt, null);
     }
 
     public static Account create(AccountId id, TenantId tenantId, Currency currency) {

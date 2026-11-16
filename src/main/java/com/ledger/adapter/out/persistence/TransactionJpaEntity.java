@@ -9,8 +9,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PostPersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.Version;
+import org.springframework.data.domain.Persistable;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -20,7 +24,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "transactions")
-public class TransactionJpaEntity {
+public class TransactionJpaEntity implements Persistable<UUID> {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -45,6 +49,24 @@ public class TransactionJpaEntity {
 
     @Column(name = "finalized_at")
     private Instant finalizedAt;
+
+    @Transient
+    private boolean isNew = false;
+
+    @Override
+    public boolean isNew() {
+        return isNew || version == null;
+    }
+
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
+    }
+
+    @PostLoad
+    @PostPersist
+    void markNotNew() {
+        this.isNew = false;
+    }
 
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<LedgerEntryJpaEntity> entries = new ArrayList<>();

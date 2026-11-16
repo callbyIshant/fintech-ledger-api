@@ -26,6 +26,11 @@ public class TransactionPersistenceAdapter implements TransactionRepositoryPort 
     public Transaction save(Transaction transaction) {
         Objects.requireNonNull(transaction, "Transaction cannot be null");
         TransactionJpaEntity entity = transactionPersistenceMapper.toJpaEntity(transaction);
+        if (transaction.getVersion() == null) {
+            entity.setNew(true);
+        } else {
+            entity.setNew(false);
+        }
         TransactionJpaEntity saved = springDataTransactionRepository.save(entity);
         return transactionPersistenceMapper.toDomain(saved);
     }

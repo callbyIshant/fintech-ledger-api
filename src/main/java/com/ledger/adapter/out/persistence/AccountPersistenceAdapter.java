@@ -28,6 +28,11 @@ public class AccountPersistenceAdapter implements AccountRepositoryPort {
     public Account save(Account account) {
         Objects.requireNonNull(account, "Account cannot be null");
         AccountJpaEntity entity = accountPersistenceMapper.toJpaEntity(account);
+        if (account.getVersion() == null) {
+            entity.setNew(true);
+        } else {
+            entity.setNew(false);
+        }
         AccountJpaEntity saved = springDataAccountRepository.save(entity);
         return accountPersistenceMapper.toDomain(saved);
     }

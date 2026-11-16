@@ -50,13 +50,22 @@ public class LedgerEntryPersistenceAdapter implements LedgerEntryRepositoryPort 
         Objects.requireNonNull(accountId, "AccountId cannot be null");
 
         PageRequest pageRequest = PageRequest.of(0, limit);
-        List<LedgerEntryJpaEntity> entities = repository.findByTenantIdAndAccountIdWithCursor(
-                tenantId.value(),
-                accountId.value(),
-                cursorCreatedAt,
-                cursorId,
-                pageRequest
-        );
+        List<LedgerEntryJpaEntity> entities;
+        if (cursorCreatedAt == null || cursorId == null) {
+            entities = repository.findByTenantIdAndAccountIdOrderByCreatedAtDesc(
+                    tenantId.value(),
+                    accountId.value(),
+                    pageRequest
+            );
+        } else {
+            entities = repository.findByTenantIdAndAccountIdWithCursor(
+                    tenantId.value(),
+                    accountId.value(),
+                    cursorCreatedAt,
+                    cursorId,
+                    pageRequest
+            );
+        }
 
         return entities.stream()
                 .map(mapper::toDomainEntry)
